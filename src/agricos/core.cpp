@@ -6,6 +6,7 @@
 #include "error_codes.h"
 #include "sensors.h"
 
+#include "style.h"
 #include "cli.h"
 
 static eRtcMode_t Agricos_rtcMode;
@@ -60,6 +61,8 @@ void AgricosCore_InitRegisters(void)
 
 void AgricosCore_Init(void)
 {
+    AgricosStyle_PrintAsciiLogo(logger);
+
     logger << LOG_MASTER << F("------------------ Initializing Agricos ------------------") << EndLine;
     Configuration::init();
 
