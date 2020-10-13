@@ -1,0 +1,6 @@
+#if !defined(ADC_MODULES_INTERNAL_H)
+#define ADC_MODULES_INTERNAL_H
+
+
+
+#endif // ADC_MODULES_INTERNAL_H

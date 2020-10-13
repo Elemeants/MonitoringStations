@@ -1,0 +1,18 @@
+#if !defined(AGRICOS_CONFIG_H)
+#define AGRICOS_CONFIG_H
+
+#define PROGRAMMER_NAME "Daniel Polanco"
+#define FIRMWARE_VERSION "v3.0"
+#define BOARD_VERSION 210
+
+#define ENABLE_STATUS_LED 1
+
+#if ENABLE_STATUS_LED
+#if BOARD_VERSION == 210
+#define STATUS_LED_GPIO 30
+#elif BOARD_VERSION == 200
+#define STATUS_LED_GPIO 24
+#endif
+#endif
+
+#endif  // AGRICOS_CONFIG_H

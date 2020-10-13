@@ -1,0 +1,9 @@
+#if !defined(SIM800H_CONFIG_H)
+#define SIM800H_CONFIG_H
+
+#define GSM_PORT Serial2
+
+#define GSM_GPRS_HTTP_BUFFER_SIZE 1024
+#define GSM_SERIAL_BAUDRATE 38400
+
+#endif // SIM800H_CONFIG_H

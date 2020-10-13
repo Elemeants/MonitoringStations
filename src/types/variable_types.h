@@ -1,0 +1,35 @@
+#if !defined(MEASURE_TYPES_H)
+#define MEASURE_TYPES_H
+
+typedef enum
+{
+    // Statin variable measurement
+    VARIABLE_TYPE_BATTERY,
+    VARIABLE_TYPE_GPS,
+
+    // Meteorology varaible measurement
+    VARIABLE_TYPE_TEMPERATURE,
+    VARIABLE_TYPE_HUMIDITY,
+    VARIABLE_TYPE_RAIN,
+    VARIABLE_TYPE_WIND_SPEED,
+    VARIABLE_TYPE_WIND_DIRECTION,
+    VARIABLE_TYPE_PREASSURE,
+    VARIABLE_TYPE_VAPORT_PRESURE,
+
+    // Radiation varaible
+    VARIABLE_TYPE_PAR_RADIATION,
+    VARIABLE_TYPE_UV_RADIATION,
+    VARIABLE_TYPE_IRR_RADIATION,
+
+    // Soil properties measurement
+    VARIABLE_TYPE_PH,
+    VARIABLE_TYPE_EC,
+    VARIABLE_TYPE_SOIL_TEMPERATURE,
+    VARIABLE_TYPE_SOIL_HUMIDITY,
+    VARIABLE_TYPE_WATER_POTENTIAL,
+
+    // Crop variable measurement
+    VARIABLE_TYPE_LEAF_HUMIDITY,
+} VariableType_t;
+
+#endif  // MEASURE_TYPES_H
