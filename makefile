@@ -59,9 +59,9 @@ read_eeprom:
 monitor:
 	@echo Enabling monitor
 ifndef PORT
-	@pio device monitor -b ${BAUDRATE}
+	@pio device monitor -b ${BAUDRATE} --raw
 else
-	@pio device monitor -b ${BAUDRATE} -p ${PORT}
+	@pio device monitor -b ${BAUDRATE} -p ${PORT} --raw
 endif
 
 clean:
