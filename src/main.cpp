@@ -3,7 +3,7 @@
 
 void setup()
 {
-    AgricosCore_OutputTask = []() -> void { };
+    AgricosCore_OutputTask = []() -> bool { return true; };
     AgricosCore_Init();
 }
 
