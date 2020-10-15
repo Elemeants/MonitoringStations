@@ -61,7 +61,7 @@ IKernelLogger &IKernelLogger::operator<<(LoggerSpecialChar_t specialChar)
     switch (specialChar)
     {
     case EndLine:
-        (*this) << F("\n");
+        (*this) << LOGGER_TEXT_RESET << F("\n");
         break;
     }
     return *this;
@@ -70,7 +70,7 @@ IKernelLogger &IKernelLogger::operator<<(LoggerSpecialChar_t specialChar)
 IKernelLogger &IKernelLogger::operator<<(eLogLevel_t lvl)
 {
     this->canLog = lvl >= this->log_lvl;
-    (*this) << GetStringLogLevel(lvl);
+    (*this) << LOGGER_TEXT_RESET << GetStringLogLevel(lvl);
     return *this;
 }
 

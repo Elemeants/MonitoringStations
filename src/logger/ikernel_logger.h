@@ -55,18 +55,17 @@ const __FlashStringHelper *GetStringLogLevel(eLogLevel_t);
 class IKernelLogger : public Print
 {
     eLogLevel_t log_lvl;
+
     Print &cout;
-    Print *secondary_cout;
+
     bool canLog = false;
     LoggerIntBase_e intBase;
 
 public:
     IKernelLogger(Print &printOut)
-        : cout(printOut), secondary_cout(NULL), intBase(INT_DEC)
+        : cout(printOut), intBase(INT_DEC)
     {
     }
-
-    void setSecondaryOutput(Print *printeable);
 
     virtual void begin() = 0;
     virtual void begin(uint32_t) = 0;
