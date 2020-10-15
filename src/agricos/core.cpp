@@ -114,7 +114,7 @@ static void AgricosCore_UpdateDateTime(void)
     TimeProvider->update();
     Time_s time = TimeProvider->getTime();
     time.toCharArray(datetime);
-    logger.setPrefix(datetime);
+    // logger.setPrefix(datetime);
 }
 
 static void AgricosCore_PrintStatus(void)

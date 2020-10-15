@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "ikernel_logger.h"
+#include <HardwareSerial.h>
 
 class SerialLogger : public IKernelLogger
 {

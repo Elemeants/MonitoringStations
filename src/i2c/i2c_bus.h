@@ -85,9 +85,7 @@ T *_I2CBus::get(uint8_t addrss)
             return (T *)(device);
         }
     }
-    Logger::getInstance().print(GetStringLogLevel(LOG_ERROR));
-    Logger::getInstance().print(F("Do not exists an device with address: "));
-    Logger::getInstance().println(addrss, HEX);
+    logger << LOG_ERROR << F("Do not exists an device with address: 0x") << INT_HEX << addrss << EndLine;
     return NULL;
 }
 
