@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 #include "config_provider.h"
+#include "devices/include.h"
 #include "globals.h"
 
 HardwareSerial &CliSerialPort = Serial;
@@ -10,11 +11,45 @@ SimpleCLI AgricosCli;
 
 void AgricosCli_CheckCommands(void)
 {
-    if (CliSerialPort.available())
+    static char input[50];
+    static bool command_detected = false;
+    static bool cmd_overflow = false;
+    static uint8_t in_index = 0;
+
+    while (CliSerialPort.available())
     {
-        String input = CliSerialPort.readStringUntil('\n');
+        char c = CliSerialPort.read();
+
+        if (c == '\n')
+        {
+            command_detected = true;
+            in_index = 0;
+            break;
+        }
+
+        input[in_index] = c;
+        in_index++;
+
+        if (in_index >= array_size(input))
+        {
+            cmd_overflow = true;
+            in_index = 0;
+            break;
+        }
+    }
+    if (cmd_overflow)
+    {
+        logger << LOG_ERROR << F(" # Agricos@Cli > ") << input << EndLine;
+        cmd_overflow = false;
+        for_in_range(uint8_t, i, 0, sizeof(input)) { input[i] = 0x00; }
+    }
+
+    if (command_detected)
+    {
         logger << LOG_MASTER << F(" # Agricos@Cli > ") << input << EndLine;
         AgricosCli.parse(input);
+        command_detected = false;
+        for_in_range(uint8_t, i, 0, sizeof(input)) { input[i] = 0x00; }
     }
 }
 
@@ -45,8 +80,6 @@ void errorCallback(cmd_error *e)
 
 void AgricosCli_Setup(void)
 {
-    CliSerialPort.setTimeout(1000);
-
     AgricosCli.setOnError(errorCallback);  // Set error Callback
 
     AgricosCli.addCommand("help", [](cmd *cmd) -> void {
@@ -54,7 +87,7 @@ void AgricosCli_Setup(void)
     });
 
     AgricosCli.addCommand("status", [](cmd *cmd) -> void {
-        
+
     });
 
     AgricosCli.addCommand("conf", [](cmd *cmd) -> void {
@@ -93,5 +126,21 @@ void AgricosCli_Setup(void)
         Command cmd(_cmd);
         String logLv = cmd.getArgument("v").getValue();
         logger << LOG_MASTER << F(" Set UTC time as: ") << logLv << EndLine;
+    });
+
+    AddCommandToAgricosCli("test", "v", " tests some device", [](cmd *_cmd) -> void {
+        Command cmd(_cmd);
+        String testCode = cmd.getArgument("v").getValue();
+
+        if (testCode == "led")
+        {
+            logger << LOG_MASTER << LOGGER_TEXT_GREEN << F(" Blinking status led every 100ms while 1s ") << EndLine;
+            for_in_range(uint8_t, i, 0, 10)
+            {
+                StatusLed::blink();
+                delay(100);
+            }
+            logger << LOG_MASTER << LOGGER_TEXT_GREEN << F(" END TEST") << EndLine;
+        }
     });
 }
