@@ -32,7 +32,7 @@ IAdcI2CDevice *ADC_Devices[] = {
 
 void AgricosDevices_Init(void)
 {
-    logger << LOG_MASTER << F("Initializing Devices") << EndLine;
+    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Initializing Devices") << EndLine;
 
     logger << LOG_MASTER << F("    ├── Initializing Drivers - RTC") << EndLine;
     RTC_Setup(_rtc);
@@ -48,5 +48,5 @@ void AgricosDevices_Init(void)
     ADC_Init(ADC_Devices, array_size(ADC_Devices));
 
     logger << LOG_MASTER << F("    └── Initializing Status Led") << EndLine;
-    StatusLed::initLed();
+    StatusLed::initLed(STATUS_LED_GPIO);
 }

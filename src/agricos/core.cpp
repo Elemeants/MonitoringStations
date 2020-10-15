@@ -2,18 +2,18 @@
 
 #include <avr/wdt.h>
 
+#include "cli.h"
 #include "devices.h"
 #include "error_codes.h"
 #include "sensors.h"
-
 #include "style.h"
-#include "cli.h"
 
 static eRtcMode_t Agricos_rtcMode;
 static bool Agricos_isSended;
 
 static uint32_t Agricos_noMeasures = 0;
 static uint32_t Agricos_SuccessMeasures = 0;
+static uint32_t last_blink = 0;
 
 static _JsonMeasureRegister JSONOutput;
 StaticJsonDocument<JSON_STATIC_RAM_SIZE> jsonFileRoot;
@@ -43,11 +43,12 @@ void throw_error(uint8_t errorCode)
         logger << LOG_ERROR << F("Error ocurred... reseting device") << EndLine;
         break;
     }
-    while (1) ;
+    while (1)
+        ;
 }
 
 void initVariant(void)
-{;
+{
     logger.begin();
     eLogLevel_t lv = Configuration::readLogLevel();
     logger.setLogLevel(lv);
@@ -63,31 +64,26 @@ void AgricosCore_Init(void)
 {
     AgricosStyle_PrintAsciiLogo(logger);
 
-    logger << LOG_MASTER << F("------------------ Initializing Agricos ------------------") << EndLine;
+    logger << LOG_MASTER << LOGGER_TEXT_BOLD << LOGGER_TEXT_GREEN << F("------------------ Initializing Agricos ------------------") << EndLine;
     Configuration::init();
-
-#if ENABLE_STATUS_LED
-    logger << LOG_MASTER << F("Initializing Status Led") << EndLine;
-    StatusLed::initLed();
-#endif
 
     Agricos_rtcMode = (eRtcMode_t)Configuration::readRTCMode();
 
-    logger << LOG_MASTER << F("Initializing I2C Drivers") << EndLine;
+    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Initializing I2C Drivers") << EndLine;
     I2CBus.begin();
 
-    logger << LOG_MASTER << F("Initializing I2C Scan") << EndLine;
+    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Initializing I2C Scan") << EndLine;
     I2CBus.scan();
 
     AgricosDevices_Init();
 
-    logger << LOG_MASTER << F("Executing setup tasks") << EndLine;
+    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Executing setup tasks") << EndLine;
     SetupTasksRegister.run();
 
-    logger << LOG_MASTER << F("Executing sensors setup tasks") << EndLine;
+    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Executing sensors setup tasks") << EndLine;
     SensorsRegister.setup();
 
-    logger << LOG_MASTER << F("Configuring CLI Interface") << EndLine;
+    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Configuring CLI Interface") << EndLine;
     AgricosCli_Setup();
 
     if (!TimeProvider)
@@ -100,7 +96,7 @@ void AgricosCore_Init(void)
         throw_error(AGRICOS_ERROR_OUT_FUNCTION_NOT_DEFINED);
     }
 
-    logger << LOG_MASTER << F("Executing loop...") << EndLine;
+    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Executing loop...") << EndLine;
     while (1)
     {
         AgricosCore_Task();
@@ -115,10 +111,6 @@ static void AgricosCore_UpdateDateTime(void)
     Time_s time = TimeProvider->getTime();
     time.toCharArray(datetime);
     // logger.setPrefix(datetime);
-}
-
-static void AgricosCore_PrintStatus(void)
-{
 }
 
 static bool AgricosCore_SendDataTrigger(void)
@@ -153,9 +145,18 @@ static void AgricosCore_UpdateStatus()
 void AgricosCore_Task(void)
 {
 #if ENABLE_STATUS_LED
-    StatusLed::blink();
+    if (last_blink > millis())
+    {
+        last_blink = millis();
+    }
+    if (millis() - last_blink > 500U)
+    {
+        StatusLed::blink();
+        last_blink = millis();
+    }
 #endif
     AgricosCore_UpdateStatus();
+
     AgricosCli_CheckCommands();
 
     bool send = AgricosCore_SendDataTrigger();
@@ -164,13 +165,13 @@ void AgricosCore_Task(void)
     {
         Agricos_isSended = true;
 
-        logger << LOG_MASTER << F("------- Executing PreLoopTask -------") << EndLine;
+        logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F("Executing PreLoopTask") << EndLine;
         PreLoopTaskRegister.run();
 
-        logger << LOG_MASTER << F("--- Executing MeasureRegister Init --") << EndLine;
+        logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F("Executing MeasureRegister Init") << EndLine;
         MeasureRegister->init();
 
-        logger << LOG_MASTER << F("------- Executing Sensors Reg -------") << EndLine;
+        logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F("Executing Sensors Reg") << EndLine;
         SensorsRegister.run();
 
         if (AgricosCore_OutputTask())
@@ -189,7 +190,7 @@ void AgricosCore_Task(void)
             }
         }
 
-        logger << LOG_MASTER << F("------- Executing PostLoopTask ------") << EndLine;
+        logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F("Executing PostLoopTask") << EndLine;
         PostLoopTaskRegister.run();
 
         Agricos_noMeasures++;
