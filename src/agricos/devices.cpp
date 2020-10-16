@@ -47,6 +47,9 @@ void AgricosDevices_Init(void)
     logger << LOG_MASTER << F("    ├── Initializing Drivers - ACD") << EndLine;
     ADC_Init(ADC_Devices, array_size(ADC_Devices));
 
+    logger << LOG_MASTER << F("    ├── Initializing Drivers - MicroSD") << EndLine;
+    MicroSD_Init(SD_CS_PIN);
+
     logger << LOG_MASTER << F("    └── Initializing Status Led") << EndLine;
     StatusLed::initLed(STATUS_LED_GPIO);
 }
