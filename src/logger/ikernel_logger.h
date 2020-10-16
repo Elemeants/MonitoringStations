@@ -4,6 +4,7 @@
 #include <Print.h>
 
 #include "config.h"
+#include "utils/datetime.h"
 
 // Local macro for prefix debug msg
 #define LOG_DEBUG_PREFIX_MSG "[\033[1m\033[35m DEBUG \033[0m]: "
@@ -59,6 +60,7 @@ class IKernelLogger : public Print
     Print &cout;
 
     bool canLog = false;
+    bool printTime = false;
     LoggerIntBase_e intBase;
 
 public:
@@ -74,6 +76,8 @@ public:
 
     virtual size_t write(const uint8_t *buffer, size_t size);
     virtual size_t write(uint8_t _byte);
+
+    void setLogTime(Time_s);
 
     eLogLevel_t logLevel() const { return this->log_lvl; }
     void setLogLevel(const eLogLevel_t &_lvl) { this->log_lvl = _lvl; }

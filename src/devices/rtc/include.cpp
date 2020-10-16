@@ -15,6 +15,7 @@ void RTC_Setup(IRTCI2c &rtc)
         else
         {
             logger.log(F("          └── RTC: OK"), LOG_MASTER);
+            rtc.update();
         }
 #if ADJUST_RTC_FROM_COMPILER
         else

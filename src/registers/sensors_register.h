@@ -23,7 +23,7 @@ public:
         _for_each(bus, task, ISensor*)
         {
             task->update();
-            task->registerMeasure(0);
+            task->registerMeasure();
         }
         _isReading = false;
     }
@@ -31,7 +31,7 @@ public:
     void registerMeasures()
     {
         _for_each(bus, task, ISensor*)
-            task->registerMeasure(0);
+            task->registerMeasure();
     }
 
     bool isReading() { return _isReading; }

@@ -95,6 +95,7 @@ struct Time_s {
   uint8_t minute;
   uint8_t second;
   
+  Time_s() { }
   Time_s(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
   Time_s(DateTime time);
 

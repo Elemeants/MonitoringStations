@@ -6,8 +6,11 @@
 typedef struct
 {
     Time_s sysTime;
+    eRtcMode_t sysRtcMode;
+
     uint32_t sysMilliseconds;
     uint32_t suceessMeasures;
-} AgricosCore_Status;
+    uint32_t measuresTaked;
+} AgricosCore_Status_t;
 
 #endif  // AGRICOS_SYS_STATUS_H

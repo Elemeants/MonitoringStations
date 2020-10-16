@@ -6,5 +6,6 @@
 #include "sim800h/api.h"
 #include "rtc/include.h"
 #include "status_led/driver.h"
+#include "microsd_card/api.h"
 
 #endif // DEVICES_INCLUDE_H

@@ -1,5 +1,9 @@
 #include "ikernel_logger.h"
 
+#include "utils/array_utils.h"
+
+static char LOGGER_TIME_BUFF[30];
+
 const __FlashStringHelper *GetStringLogLevel(eLogLevel_t log_lv)
 {
     switch (log_lv)
@@ -25,6 +29,13 @@ size_t IKernelLogger::write(const uint8_t *buffer, size_t size)
 size_t IKernelLogger::write(uint8_t _byte)
 {
     return this->cout.write(_byte);
+}
+
+void IKernelLogger::setLogTime(Time_s time)
+{
+    clear_array(LOGGER_TIME_BUFF, array_size(LOGGER_TIME_BUFF));
+    time.toCharArray(LOGGER_TIME_BUFF);
+    printTime = true;
 }
 
 IKernelLogger &IKernelLogger::operator<<(LoggerIntBase_e base)
@@ -70,7 +81,10 @@ IKernelLogger &IKernelLogger::operator<<(LoggerSpecialChar_t specialChar)
 IKernelLogger &IKernelLogger::operator<<(eLogLevel_t lvl)
 {
     this->canLog = lvl >= this->log_lvl;
-    (*this) << LOGGER_TEXT_RESET << GetStringLogLevel(lvl);
+    (*this) << LOGGER_TEXT_RESET;
+    if (printTime)
+        (*this) << LOGGER_TEXT_BOLD << F("> ") << LOGGER_TIME_BUFF << F(" ");
+    (*this) << GetStringLogLevel(lvl);
     return *this;
 }
 
