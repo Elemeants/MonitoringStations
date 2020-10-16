@@ -23,9 +23,12 @@ void updateStationCode();
 void updateUrlServer();
 
 eLogLevel_t readLogLevel();
-uint8_t readRTCMode();
-uint8_t isAdjustRTCEnabled();
+void storeLogLevel(eLogLevel_t level);
 
+uint8_t readRTCMode();
+void storeRTCMode(uint8_t mode);
+
+uint8_t isAdjustRTCEnabled();
 Time_s readAdjustTime();
 }  // namespace Configuration
 

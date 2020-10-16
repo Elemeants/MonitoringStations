@@ -92,9 +92,23 @@ eLogLevel_t Configuration::readLogLevel()
     return (eLogLevel_t)(ee_read(OFFSET_LOG_RTC_CONFIG) >> 0x4);
 }
 
+void storeLogLevel(eLogLevel_t mode)
+{
+    uint8_t mask = ee_read(OFFSET_LOG_RTC_CONFIG) & 0b1111;
+    mask |= (((uint8_t)mode & 0b1111) << 4);
+    ee_write(OFFSET_LOG_RTC_CONFIG, mask);
+}
+
 uint8_t Configuration::readRTCMode()
 {
     return ee_read(OFFSET_LOG_RTC_CONFIG) & 0b0111;
+}
+
+void storeRTCMode(uint8_t mode)
+{
+    uint8_t mask = ee_read(OFFSET_LOG_RTC_CONFIG) & (0b11111 << 4);
+    mask |= (mode & 0b111);
+    ee_write(OFFSET_LOG_RTC_CONFIG, mask);
 }
 
 uint8_t Configuration::isAdjustRTCEnabled()
