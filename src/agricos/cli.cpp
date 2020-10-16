@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #include "config_provider.h"
-#include "devices/include.h"
+#include "devices.h"
 #include "globals.h"
 
 HardwareSerial &CliSerialPort = Serial;
@@ -37,6 +37,7 @@ void AgricosCli_CheckCommands(void)
             break;
         }
     }
+
     if (cmd_overflow)
     {
         logger << LOG_ERROR << F(" # Agricos@Cli > ") << input << EndLine;
@@ -140,6 +141,13 @@ void AgricosCli_Setup(void)
                 StatusLed::blink();
                 delay(100);
             }
+            logger << LOG_MASTER << LOGGER_TEXT_GREEN << F(" END TEST") << EndLine;
+        }
+
+        if (testCode == "microsd")
+        {
+            logger << LOG_MASTER << LOGGER_TEXT_GREEN << F(" Trying to begin micro sd card") << EndLine;
+            MicroSD_Init(SD_CS_PIN);
             logger << LOG_MASTER << LOGGER_TEXT_GREEN << F(" END TEST") << EndLine;
         }
     });
