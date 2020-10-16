@@ -8,12 +8,19 @@
 #include "sensors.h"
 #include "style.h"
 
-static eRtcMode_t Agricos_rtcMode;
-static bool Agricos_isSended;
+#define doUntilTimeElapsed(__time_handler, __ms_elapsed, __function) \
+    static uint32_t __time_handler = 0;                              \
+    if (__time_handler > millis())                                   \
+    {                                                                \
+        __time_handler = millis();                                   \
+    }                                                                \
+    if ((millis() - __time_handler) > __ms_elapsed)                  \
+    {                                                                \
+        __time_handler = millis();                                   \
+        __function                                                   \
+    }
 
-static uint32_t Agricos_noMeasures = 0;
-static uint32_t Agricos_SuccessMeasures = 0;
-static uint32_t last_blink = 0;
+AgricosCore_Status_t AgricosSysStatus;
 
 static _JsonMeasureRegister JSONOutput;
 StaticJsonDocument<JSON_STATIC_RAM_SIZE> jsonFileRoot;
@@ -64,26 +71,26 @@ void AgricosCore_Init(void)
 {
     AgricosStyle_PrintAsciiLogo(logger);
 
-    logger << LOG_MASTER << LOGGER_TEXT_BOLD << LOGGER_TEXT_GREEN << F("------------------ Initializing Agricos ------------------") << EndLine;
+    logger << LOG_MASTER << LOGGER_TEXT_BOLD << F("------------------ Initializing Agricos ------------------") << EndLine;
     Configuration::init();
 
-    Agricos_rtcMode = (eRtcMode_t)Configuration::readRTCMode();
+    AgricosSysStatus.sysRtcMode = (eRtcMode_t)Configuration::readRTCMode();
 
-    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Initializing I2C Drivers") << EndLine;
+    logger << LOG_MASTER << F("Initializing I2C Drivers") << EndLine;
     I2CBus.begin();
 
-    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Initializing I2C Scan") << EndLine;
+    logger << LOG_MASTER << F("Initializing I2C Scan") << EndLine;
     I2CBus.scan();
 
     AgricosDevices_Init();
 
-    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Executing setup tasks") << EndLine;
+    logger << LOG_MASTER << F("Executing setup tasks") << EndLine;
     SetupTasksRegister.run();
 
-    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Executing sensors setup tasks") << EndLine;
+    logger << LOG_MASTER << F("Executing sensors setup tasks") << EndLine;
     SensorsRegister.setup();
 
-    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Configuring CLI Interface") << EndLine;
+    logger << LOG_MASTER << F("Configuring CLI Interface") << EndLine;
     AgricosCli_Setup();
 
     if (!TimeProvider)
@@ -96,27 +103,24 @@ void AgricosCore_Init(void)
         throw_error(AGRICOS_ERROR_OUT_FUNCTION_NOT_DEFINED);
     }
 
-    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Executing loop...") << EndLine;
+    logger << LOG_MASTER << F("Executing loop...") << EndLine;
     while (1)
     {
         AgricosCore_Task();
     }
 }
 
-static char datetime[30];
-
 static void AgricosCore_UpdateDateTime(void)
 {
     TimeProvider->update();
-    Time_s time = TimeProvider->getTime();
-    time.toCharArray(datetime);
-    // logger.setPrefix(datetime);
+    AgricosSysStatus.sysTime = TimeProvider->getTime();
+    logger.setLogTime(AgricosSysStatus.sysTime);
 }
 
 static bool AgricosCore_SendDataTrigger(void)
 {
     Time_s time = TimeProvider->getTime();
-    switch (Agricos_rtcMode)
+    switch (AgricosSysStatus.sysRtcMode)
     {
     case RTC_30_MINUTES:
         return time.minute % 30 == 0;
@@ -129,33 +133,18 @@ static bool AgricosCore_SendDataTrigger(void)
     }
 }
 
-static void AgricosCore_UpdateStatus()
-{
-    uint32_t millisecond = millis();
-    while (millis() - millisecond > 5000)
-    {
-        if (millis() < millisecond)
-        {
-            millisecond = millis();
-        }
-        AgricosCore_UpdateDateTime();
-    }
-}
-
 void AgricosCore_Task(void)
 {
+    static bool Agricos_isSended = false;
+    AgricosSysStatus.sysMilliseconds = millis();
 #if ENABLE_STATUS_LED
-    if (last_blink > millis())
-    {
-        last_blink = millis();
-    }
-    if (millis() - last_blink > 500U)
-    {
+    doUntilTimeElapsed(__blink_led_handler, 250, {
         StatusLed::blink();
-        last_blink = millis();
-    }
+    });
 #endif
-    AgricosCore_UpdateStatus();
+    doUntilTimeElapsed(__update_rtc_handler, 1000, {
+        AgricosCore_UpdateDateTime();
+    });
 
     AgricosCli_CheckCommands();
 
@@ -176,7 +165,7 @@ void AgricosCore_Task(void)
 
         if (AgricosCore_OutputTask())
         {
-            Agricos_SuccessMeasures++;
+            AgricosSysStatus.suceessMeasures++;
             if (AgricosCore_onSuccess)
             {
                 AgricosCore_onSuccess();
@@ -192,8 +181,7 @@ void AgricosCore_Task(void)
 
         logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F("Executing PostLoopTask") << EndLine;
         PostLoopTaskRegister.run();
-
-        Agricos_noMeasures++;
+        AgricosSysStatus.measuresTaked++;
     }
     else if (!send)
     {
