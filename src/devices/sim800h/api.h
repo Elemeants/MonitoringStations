@@ -71,6 +71,8 @@ void GSM_Init();
 void GSM_GPRSInit();
 void GSM_PrintStatus();
 
+void gprs_post_to_host();
+
 namespace HTTP
 {
 uint8_t http_raw(HTTP_METHOD_e method, char *url, uint8_t *buffer, uint16_t length);

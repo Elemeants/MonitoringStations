@@ -10,6 +10,7 @@
 #include "types/register.h"
 #include "types/rtc_mode.h"
 #include "types/trigger_core_task.h"
+#include "types/variable_types.h"
 #include "utils/array_utils.h"
 #include "utils/datetime.h"
 #include "utils/eeprom_utils.h"
@@ -17,10 +18,10 @@
 #include "utils/free_memory.h"
 #include "utils/linked_list.h"
 #include "utils/linked_list_utils.h"
+#include "utils/crc_16.h"
 
 extern ITimeProvider *TimeProvider;
 extern _MeasureRegister *MeasureRegister;
-extern _SensorsRegister SensorsRegister;
 extern _ITaskRegister SetupTasksRegister;
 
 extern _ITaskRegister PostLoopTaskRegister;

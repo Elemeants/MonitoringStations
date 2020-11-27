@@ -17,4 +17,8 @@ extern void throw_error(uint8_t errorCode);
 
 extern AgricosCore_Status_t AgricosSysStatus;
 
+extern inline void OS_init(void);
+
+extern inline void OS_reset(void);
+
 #endif  // AGRICOS_CORE_H

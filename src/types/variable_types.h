@@ -1,11 +1,12 @@
 #if !defined(MEASURE_TYPES_H)
 #define MEASURE_TYPES_H
 
+#include "utils/datetime.h"
+
 typedef enum
 {
-    // Statin variable measurement
+    // Station variable measurement
     VARIABLE_TYPE_BATTERY,
-    VARIABLE_TYPE_GPS,
 
     // Meteorology varaible measurement
     VARIABLE_TYPE_TEMPERATURE,
@@ -14,7 +15,7 @@ typedef enum
     VARIABLE_TYPE_WIND_SPEED,
     VARIABLE_TYPE_WIND_DIRECTION,
     VARIABLE_TYPE_PREASSURE,
-    VARIABLE_TYPE_VAPORT_PRESURE,
+    VARIABLE_TYPE_VAPOR_PRESURE,
 
     // Radiation varaible
     VARIABLE_TYPE_PAR_RADIATION,
@@ -27,9 +28,17 @@ typedef enum
     VARIABLE_TYPE_SOIL_TEMPERATURE,
     VARIABLE_TYPE_SOIL_HUMIDITY,
     VARIABLE_TYPE_WATER_POTENTIAL,
+    VARIABLE_TYPE_SOIL_SALINITY,
 
     // Crop variable measurement
     VARIABLE_TYPE_LEAF_HUMIDITY,
-} VariableType_t;
+    VARIABLE_TYPE_LEAF_TEMPERATURE,
+} VariableType_e;
+
+typedef struct
+{
+    VariableType_e type;
+    float measure;
+} Variable_t;
 
 #endif  // MEASURE_TYPES_H

@@ -14,12 +14,55 @@ struct _JsonMeasureRegister : _MeasureRegister
 private:
     JsonArray measures;
 
+    const __FlashStringHelper *VariableTypeCode(VariableType_e type)
+    {
+        switch (type)
+        {
+        case VARIABLE_TYPE_BATTERY:
+            return F("");
+        case VARIABLE_TYPE_TEMPERATURE:
+            return F("");
+        case VARIABLE_TYPE_HUMIDITY:
+            return F("");
+        case VARIABLE_TYPE_RAIN:
+            return F("");
+        case VARIABLE_TYPE_WIND_SPEED:
+            return F("");
+        case VARIABLE_TYPE_WIND_DIRECTION:
+            return F("");
+        case VARIABLE_TYPE_PREASSURE:
+            return F("");
+        case VARIABLE_TYPE_VAPOR_PRESURE:
+            return F("");
+        case VARIABLE_TYPE_PAR_RADIATION:
+            return F("");
+        case VARIABLE_TYPE_UV_RADIATION:
+            return F("");
+        case VARIABLE_TYPE_IRR_RADIATION:
+            return F("");
+        case VARIABLE_TYPE_PH:
+            return F("");
+        case VARIABLE_TYPE_EC:
+            return F("");
+        case VARIABLE_TYPE_SOIL_TEMPERATURE:
+            return F("");
+        case VARIABLE_TYPE_SOIL_HUMIDITY:
+            return F("");
+        case VARIABLE_TYPE_WATER_POTENTIAL:
+            return F("");
+        case VARIABLE_TYPE_LEAF_HUMIDITY:
+            return F("");
+        default:
+            return F("");
+        }
+    }
+
     template <typename T>
-    bool _addMeasure(T &val, const __FlashStringHelper *code)
+    bool _addMeasure(T &val, VariableType_e type)
     {
         JsonObject aux = measures.createNestedObject();
         aux["v"] = val;
-        aux["m"] = code;
+        aux["m"] = VariableTypeCode(type);
         return true;
     }
 
@@ -50,19 +93,19 @@ public:
     bool addAttribute(const char *value, const __FlashStringHelper *code) { return _addAttribute(value, code); }
     bool addAttribute(char *value, const __FlashStringHelper *code) { return _addAttribute(value, code); }
 
-    bool addMeasure(bool &value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(float &value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(double &value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(signed char &value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(signed long &value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(signed int &value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(signed short &value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(unsigned char &value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(unsigned long &value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(unsigned int &value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(unsigned short &value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(const char *value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
-    bool addMeasure(char *value, const __FlashStringHelper *code) { return _addMeasure(value, code); }
+    bool addMeasure(bool &value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(float &value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(double &value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(signed char &value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(signed long &value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(signed int &value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(signed short &value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(unsigned char &value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(unsigned long &value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(unsigned int &value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(unsigned short &value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(const char *value, VariableType_e type) { return _addMeasure(value, type); }
+    bool addMeasure(char *value, VariableType_e type) { return _addMeasure(value, type); }
 
     void init()
     {

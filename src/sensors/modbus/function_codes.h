@@ -1,0 +1,10 @@
+#if !defined(SENSORS_MODBUS_FUNCTION_CODES_H)
+#define SENSORS_MODBUS_FUNCTION_CODES_H
+
+typedef enum
+{
+    MODBUS_FUNCTION_READ = 0x03,
+    MODBUS_FUNCTION_WRITE = 0x06,
+} ModbusFunctionCode_e;
+
+#endif  // SENSORS_MODBUS_FUNCTION_CODES_H

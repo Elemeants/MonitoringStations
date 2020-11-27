@@ -72,7 +72,7 @@ IKernelLogger &IKernelLogger::operator<<(LoggerSpecialChar_t specialChar)
     switch (specialChar)
     {
     case EndLine:
-        (*this) << LOGGER_TEXT_RESET << F("\n");
+        (*this) << LOGGER_TEXT_RESET << F("\n\r");
         break;
     }
     return *this;

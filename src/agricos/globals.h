@@ -6,7 +6,6 @@
 
 extern ITimeProvider *TimeProvider;
 extern _MeasureRegister *MeasureRegister;
-extern _SensorsRegister SensorsRegister;
 extern _ITaskRegister SetupTasksRegister;
 
 extern _ITaskRegister PostLoopTaskRegister;

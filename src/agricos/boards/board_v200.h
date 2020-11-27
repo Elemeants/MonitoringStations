@@ -1,0 +1,7 @@
+#if !defined(AGRICOS_BOARDS_V200_H)
+#define AGRICOS_BOARDS_V200_H
+
+#define SD_CS_PIN 48
+#define STATUS_LED_GPIO 24
+
+#endif  // AGRICOS_BOARDS_V200_H

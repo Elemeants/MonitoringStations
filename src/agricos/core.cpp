@@ -26,11 +26,23 @@ static _JsonMeasureRegister JSONOutput;
 StaticJsonDocument<JSON_STATIC_RAM_SIZE> jsonFileRoot;
 _MeasureRegister *MeasureRegister = &JSONOutput;
 
-_SensorsRegister SensorsRegister;
-
 _ITaskRegister PostLoopTaskRegister;
 _ITaskRegister PreLoopTaskRegister;
 _ITaskRegister SetupTasksRegister;
+
+void OS_init(void)
+{
+    MCUSR = 0;
+    wdt_disable();
+}
+
+void OS_reset(void)
+{
+    wdt_enable(WDTO_1S);
+    logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F(" RESETING DEVICE... ") << EndLine;
+    while (1)
+        ;
+}
 
 void (*AgricosCore_onFail)(void) __attribute__((weak)) = NULL;
 void (*AgricosCore_onSuccess)(void) __attribute__((weak)) = NULL;
@@ -50,12 +62,12 @@ void throw_error(uint8_t errorCode)
         logger << LOG_ERROR << F("Error ocurred... reseting device") << EndLine;
         break;
     }
-    while (1)
-        ;
+    OS_reset();
 }
 
 void initVariant(void)
 {
+    OS_init();
     logger.begin();
     eLogLevel_t lv = Configuration::readLogLevel();
     logger.setLogLevel(lv);
@@ -86,9 +98,6 @@ void AgricosCore_Init(void)
 
     logger << LOG_MASTER << F("Executing setup tasks") << EndLine;
     SetupTasksRegister.run();
-
-    logger << LOG_MASTER << F("Executing sensors setup tasks") << EndLine;
-    SensorsRegister.setup();
 
     logger << LOG_MASTER << F("Configuring CLI Interface") << EndLine;
     AgricosCli_Setup();
@@ -137,11 +146,9 @@ void AgricosCore_Task(void)
 {
     static bool Agricos_isSended = false;
     AgricosSysStatus.sysMilliseconds = millis();
-#if ENABLE_STATUS_LED
     doUntilTimeElapsed(__blink_led_handler, 250, {
         StatusLed::blink();
     });
-#endif
     doUntilTimeElapsed(__update_rtc_handler, 1000, {
         AgricosCore_UpdateDateTime();
     });
@@ -159,9 +166,6 @@ void AgricosCore_Task(void)
 
         logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F("Executing MeasureRegister Init") << EndLine;
         MeasureRegister->init();
-
-        logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F("Executing Sensors Reg") << EndLine;
-        SensorsRegister.run();
 
         if (AgricosCore_OutputTask())
         {

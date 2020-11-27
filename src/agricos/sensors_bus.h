@@ -14,8 +14,6 @@ struct AgricosSensor
 {
     const char *name;
     AgricosSensorType_e type;
-    
-    
 };
 
 #endif  // AGRICOS_SENSORS_BUS_H

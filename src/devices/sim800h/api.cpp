@@ -64,13 +64,13 @@ static void GSM_CheckStatus()
     }
 }
 
-static void gprs_post_to_host(void *_)
+void gprs_post_to_host()
 {
-    if (!isEnabledGPRS)
-    {
-        logger << LOG_ERROR << F("Can't send post because gprs is not running") << EndLine;
-        return;
-    }
+    // if (!isEnabledGPRS)
+    // {
+    //     logger << LOG_ERROR << F("Can't send post because gprs is not running") << EndLine;
+    //     return;
+    // }
 
     serializeJson(jsonFileRoot, body_post_buffer, array_size(body_post_buffer));
     HTTP::post(GPRS_POST_HOST, (uint8_t *)body_post_buffer, strlen(body_post_buffer));

@@ -40,7 +40,7 @@ boot:
 	@${UPLOADER} ${ARGS_PROGRAMMER} -e -Ulock:w:0xff:m -Uefuse:w:0xFD:m -Uhfuse:w:0xD8:m -Ulfuse:w:0xFF:m -B 11
 	@${UPLOADER} ${ARGS_PROGRAMMER} -Uflash:w:${BOOTLOADER_FILE}:i -Ulock:w:0xcf:m
 
-flash: fuse
+flash:
 	@echo Uploading flash to MCU
 	@${UPLOADER} ${ARGS_PROGRAMMER} -Uflash:w:${FLASH_PILE}:i
 

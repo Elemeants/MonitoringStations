@@ -7,17 +7,6 @@ static ADS1115 adc_0 = ADS1115(ADS1115_IIC_ADDRESS1);
 IAdcI2CDevice *ADC_Device0 = &adc_0;
 static ADS1115 adc_1 = ADS1115(ADS1115_IIC_ADDRESS3);
 IAdcI2CDevice *ADC_Device1 = &adc_1;
-
-bool ADC_Device0_Connected()
-{
-    return adc_0.isConnected();
-}
-
-bool ADC_Device1_Connected()
-{
-    return adc_1.isConnected();
-}
-
 #endif
 
 #if RTC_MODEL == RTC_USE_DS3231
@@ -26,9 +15,7 @@ static DS3231 _rtc;
 
 ITimeProvider *TimeProvider = &_rtc;
 
-IAdcI2CDevice *ADC_Devices[] = {
-    ADC_Device0,
-    ADC_Device1};
+IAdcI2CDevice *ADC_Devices[] = {};
 
 void AgricosDevices_Init(void)
 {
