@@ -4,25 +4,35 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "../logger/ikernel_logger.h"
+#include "../utils/sensor_protocol_str.h"
 #include "registers/measure_register.h"
+#include "registers/variable_register.h"
+#include "sensor_protocols.h"
 #include "variable_types.h"
 
 extern _MeasureRegister* MeasureRegister;
+extern _VariableRegister* VariableRegister;
 
-template <size_t Nvars>
+struct SensorInfo_t
+{
+    const char* id;
+    SensorProtocols_e protocol;
+
+    LinkedList<Variable_t> variables;
+};
+
 class ISensor
 {
 protected:
-    const char* sensor_name;
-    const uint8_t NUM_VARS = Nvars;
-    Variable_t variables[Nvars];
+    SensorInfo_t info;
 
     template <VariableType_e Vtype>
     void setMeasureValue(float value)
     {
-        for_in_range(uint8_t, i, 0, (uint8_t)Nvars)
+        for_in_range(uint8_t, i, 0, info.variables.size())
         {
-            Variable_t var = variables[i];
+            Variable_t var = info.variables[i];
             if (var.type == Vtype)
             {
                 var.measure = value;
@@ -31,33 +41,50 @@ protected:
     }
 
 public:
-    ISensor(const char* sensor_name, const VariableType_e types[Nvars])
-        : sensor_name(sensor_name)
+    ISensor(const char* id, SensorProtocols_e protocol, const VariableType_e types[], uint8_t length)
     {
-        for_in_range(auto, i, 0, (uint8_t)Nvars)
+        info.id = id;
+        info.protocol = protocol;
+        for_in_range(uint8_t, i, 0, length)
         {
-            variables[i] = {types[i], 0.0F};
+            Variable_t var = VariableRegister->registerVariable(types[i]);
+            info.variables.add(var);
         }
     }
-
-    const char* getSensorName() { return this->sensor_name; }
 
     virtual void setup() = 0;
     virtual void update() = 0;
 
+    const char* getId() { return this->info.id; }
+
     virtual void registerMeasure()
     {
-        for_in_range(uint8_t, i, 0, (uint8_t)Nvars)
+        for_in_range(uint8_t, i, 0, info.variables.size())
         {
-            Variable_t var = variables[i];
-            MeasureRegister->addMeasure(var.measure, var.type);
+            MeasureRegister->addMeasure(info.variables[i]);
         }
     }
 
-    virtual void printSensorData(Print& cout)
+    virtual void logSensorData()
     {
-        cout.println(getSensorName());
+        logger << LOG_INFO << F(" Sensor ") << info.id << F(" -> Protocol: ") << SensorProtocolToStr(info.protocol) << EndLine;
+        logger << LOG_INFO << F("               Variables: ");
+        for_in_range(uint8_t, i, 0, info.variables.size())
+        {
+            Variable_t var = info.variables[i];
+            logger << VariableTypeToStr(var.type);
+            if (i < info.variables.size() - 1)
+            {
+                logger << F(", ");
+            }
+        }
     }
+
+    virtual void logAsTable(Print& cout)
+    {
+    }
+
+    SensorInfo_t getInfo() { return info; }
 };
 
 #endif  // AGRICOS_SENSOR_ISENSOR_H

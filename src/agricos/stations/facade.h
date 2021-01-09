@@ -1,0 +1,21 @@
+#if !defined(__AGRICOS_STATIONS_FECADE_H)
+#define __AGRICOS_STATIONS_FECADE_H
+
+#include "common.h"
+#include "sensors/include.h"
+#include "../config.h"
+#include "selector.h"
+
+#if AGRICOS_STATION_TARGET == CROPFIELD_POMAS_ES002
+#define AGRICOS_STATION_TARGET_STR CROPFIELD_POMAS_ES002_STR
+#endif
+#if AGRICOS_STATION_TARGET == CROPFIELD_POMAS_ES003
+#define AGRICOS_STATION_TARGET_STR CROPFIELD_POMAS_ES003_STR
+#endif
+#if AGRICOS_STATION_TARGET == CROPFIELD_POMAS_ES004
+#define AGRICOS_STATION_TARGET_STR CROPFIELD_POMAS_ES004_STR
+#endif
+
+extern void AgricosStations_AddModbusSensors(ModbusSensorBus &bus);
+
+#endif  // __AGRICOS_STATIONS_FECADE_H

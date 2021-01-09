@@ -1,55 +1,29 @@
 #include "config_provider.h"
 
+#include "config.h"
+
 /* -----------------------------------------------------------------------
  *                        EEPROM REGION CONFIGURATION
  * -----------------------------------------------------------------------
  * [0x00, 0x09]: Station code
  * [0x0A, 0x6D]: Url server to post
- * [0x6E, 0x7F]: Modules enabled
- *          (For Agricos v2)
- *          0x6E -> ModuleRtc
- *          0x6F -> ModuleDavisAnenometer
- *          0x70 -> ModuleSdCard
- *          0x71 -> ModuleMeter
- *          0x72 -> ModuleBattery
- *          0x73 -> ModuleSHT1X
- *          0x74 -> ModulePluviometer
- *          0x75 -> ModuleAnenometer
- *          0x76 -> ModuleAtlas
- *          0x77 -> ModuleApogee
- *          0x78 -> ModuleBarometer
- *          0x79 -> ModuleGps
- *          0x7A -> ModuleGprs
- *          0x7B -> RESERVED
- *          0x7C -> RESERVED
- *          0x7D -> RESERVED
- *          0x7E -> RESERVED
- *          0x7F -> RESERVED
- * [0x80, 0x80]: Kernel config
- *          0x80[2:0] -> RTC mode
- *          0x80[3]   -> Adjust RTC
- *          0x80[7:4] -> Logger mode
- * [0x81, 0x86]: Adjust Time struct
- *          0x81 -> year
- *          0x82 -> month
- *          0x83 -> day
- *          0x84 -> hour
- *          0x85 -> minute
- *          0x86 -> second
+ * [0x6E]: RTC mode
+ * [0x6F]: Logger mode
+ * [0x70]: Lat manually
+ * [0x71]: Lng manually
  * -----------------------------------------------------------------------
 */
 
 char Configuration::DeviceCode[DEVICE_CODE_LENGHT];
 char Configuration::ServerUrl[SERVER_URL_LENGHT];
 
-static uint8_t OFFSET_MODULE_ENABLED = 0x6E;
-static uint8_t OFFSET_LOG_RTC_CONFIG = 0x80;
-static uint8_t OFFSET_TIME_CONFIG = 0x81;
+float Configuration::DeviceLat;
+float Configuration::DeviceLng;
 
-bool Configuration::isModuleEnabled(uint8_t module)
-{
-    return ee_read(module + OFFSET_MODULE_ENABLED);
-}
+static uint8_t OFFSET_RTC_CONFIG = 0x6E;
+static uint8_t OFFSET_LOG_CONFIG = 0x6F;
+static uint8_t OFFSET_LAT_CONFIG = 0x70;
+static uint8_t OFFSET_LNG_CONFIG = OFFSET_LAT_CONFIG + sizeof(float) + 1U;
 
 void Configuration::readStationCode()
 {
@@ -89,57 +63,85 @@ void Configuration::updateUrlServer()
 
 eLogLevel_t Configuration::readLogLevel()
 {
-    return (eLogLevel_t)(ee_read(OFFSET_LOG_RTC_CONFIG) >> 0x4);
+    return (eLogLevel_t)(ee_read(OFFSET_LOG_CONFIG));
 }
 
-void storeLogLevel(eLogLevel_t mode)
+void Configuration::storeLogLevel(eLogLevel_t mode)
 {
-    uint8_t mask = ee_read(OFFSET_LOG_RTC_CONFIG) & 0b1111;
-    mask |= (((uint8_t)mode & 0b1111) << 4);
-    ee_write(OFFSET_LOG_RTC_CONFIG, mask);
+    ee_write((uint8_t)mode, OFFSET_LOG_CONFIG);
 }
 
 uint8_t Configuration::readRTCMode()
 {
-    return ee_read(OFFSET_LOG_RTC_CONFIG) & 0b0111;
+    return ee_read(OFFSET_RTC_CONFIG);
 }
 
-void storeRTCMode(uint8_t mode)
+void Configuration::storeRTCMode(uint8_t mode)
 {
-    uint8_t mask = ee_read(OFFSET_LOG_RTC_CONFIG) & (0b11111 << 4);
-    mask |= (mode & 0b111);
-    ee_write(OFFSET_LOG_RTC_CONFIG, mask);
+    ee_write(mode, OFFSET_RTC_CONFIG);
 }
 
-uint8_t Configuration::isAdjustRTCEnabled()
+void Configuration::readGPSLat()
 {
-    return ee_read(OFFSET_LOG_RTC_CONFIG) & 0b1000;
+    uint8_t *buffer = (uint8_t *)&Configuration::DeviceLat;
+    uint8_t len = sizeof(float);
+    ee_read_buffer(OFFSET_LAT_CONFIG, buffer, len);
+    reverse_array(buffer, len);  // We store the value as big endian so we reverse it for little endian
 }
 
-Time_s Configuration::readAdjustTime()
+void Configuration::updadteGPSLat(float lat)
 {
-    Time_s stored_time(0, 0, 0, 0, 0, 0);
-    stored_time.year = 2000U + ee_read(OFFSET_TIME_CONFIG);
-    stored_time.month = ee_read(OFFSET_TIME_CONFIG + 0x1);
-    stored_time.day = ee_read(OFFSET_TIME_CONFIG + 0x2);
-    stored_time.hour = ee_read(OFFSET_TIME_CONFIG + 0x3);
-    stored_time.minute = ee_read(OFFSET_TIME_CONFIG + 0x4);
-    stored_time.second = ee_read(OFFSET_TIME_CONFIG + 0x5);
-    return stored_time;
+    uint8_t *buffer = (uint8_t *)&Configuration::DeviceLat;
+    uint8_t len = sizeof(float);
+    ee_write_buffer(OFFSET_LAT_CONFIG, buffer, len);
+}
+
+void Configuration::readGPSLng()
+{
+    uint8_t *buffer = (uint8_t *)&Configuration::DeviceLng;
+    uint8_t len = sizeof(float);
+    ee_read_buffer(OFFSET_LNG_CONFIG, buffer, len);
+    reverse_array(buffer, len);  // We store the value as big endian so we reverse it for little endian
+}
+
+void Configuration::updadteGPSLng(float lng)
+{
+    uint8_t *buffer = (uint8_t *)&Configuration::DeviceLng;
+    uint8_t len = sizeof(float);
+    ee_write_buffer(OFFSET_LNG_CONFIG, buffer, len);
+}
+
+const __FlashStringHelper *LogLevelToStr(eLogLevel_t log_lv)
+{
+    switch (log_lv)
+    {
+    case LOG_DEBUG:
+        return F("\033[1m\033[35mDEBUG\033[0m");
+    case LOG_INFO:
+        return F("\033[1m\033[32mINFO\033[0m");
+    case LOG_WARN:
+        return F("\033[1m\033[93mWARN\033[0m");
+    case LOG_ERROR:
+        return F("\033[1m\033[91mERROR\033[0m");
+    default:
+        return F("Unknow");
+    }
 }
 
 void Configuration::printConfiguration()
 {
     logger << LOG_MASTER << F(" Station stored configuration") << EndLine;
-    logger << LOG_MASTER << F("     ├── Station code: ") << Configuration::DeviceCode << EndLine;
-    logger << LOG_MASTER << F("     ├── Url server: ") << Configuration::ServerUrl << EndLine;
-    logger << LOG_MASTER << F("     ├── Log Mode: ") << (uint8_t)Configuration::readLogLevel() << EndLine;
-    logger << LOG_MASTER << F("     ├── RTC Mode: ") << Configuration::readRTCMode() << EndLine;
-    logger << LOG_MASTER << F("     └── Adjust RTC: ") << (bool)Configuration::isAdjustRTCEnabled() << EndLine;
+    logger << LOG_MASTER << F("     ├-- Compilation:    ") << LOGGER_TEXT_YELLOW << COMPILATION_VERSION << EndLine;
+    logger << LOG_MASTER << F("     ├-- Board code:     ") << LOGGER_TEXT_YELLOW << BOARD_VERSION << EndLine;
+    logger << LOG_MASTER << F("     ├-- Station code:   ") << LOGGER_TEXT_YELLOW << Configuration::DeviceCode << EndLine;
+    logger << LOG_MASTER << F("     ├-- Url server:     ") << LOGGER_TEXT_YELLOW << Configuration::ServerUrl << EndLine;
+    logger << LOG_MASTER << F("     ├-- Log Mode:       ") << LOGGER_TEXT_YELLOW << LogLevelToStr(Configuration::readLogLevel()) << EndLine;
+    logger << LOG_MASTER << F("     └-- RTC Mode:       ") << LOGGER_TEXT_YELLOW << GetStringRtcMode((RTCMode_e)Configuration::readRTCMode()) << EndLine;
 }
 
 void Configuration::init()
 {
+    EEPROM.begin();
     Configuration::readStationCode();
     Configuration::readUrlServer();
     Configuration::printConfiguration();

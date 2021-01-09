@@ -16,8 +16,7 @@ enum GPSStatus_e
 {
     GPS_OK,
     GPS_ERROR,
-    GPS_TIMEOUT_ERROR,
-    GPS_END
+    GPS_TIMEOUT_ERROR
 };
 
 const __FlashStringHelper *GpsStatusToStr(GPSStatus_e st);

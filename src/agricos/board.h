@@ -9,6 +9,8 @@
 // ============ Configuration for board version 2.00
 #elif BOARD_VERSION == 200
 #include "boards/board_v200.h"
+#elif BOARD_VERSION == 000
+#include "boards/custom.h"
 #endif
 
 #endif // AGRICOS_CORE_BOARD_H

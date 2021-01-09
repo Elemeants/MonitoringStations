@@ -10,11 +10,11 @@ void ADC_Init(IAdcI2CDevice *devices[], uint8_t lenght)
 
         if (devices[index]->isConnected())
         {
-            logger << LOG_MASTER << F("         ├── AdcDevice on 0x") << String(index, HEX) << F(": OK") << EndLine;
+            logger << LOG_MASTER << F("         ├-- ADC Device on 0x") << String(index, HEX) << F(": OK") << EndLine;
         }
         else
         {
-            logger << LOG_ERROR << F("          ├── AdcDevice on 0x") << String(index, HEX) << F(": ERROR") << EndLine;
+            logger << LOG_ERROR << F("          ├-- ADC Device on 0x") << String(index, HEX) << F(": ERROR") << EndLine;
         }
     }
 }

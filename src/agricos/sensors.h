@@ -1,11 +1,13 @@
-#if !defined(AGRICOS_SENSORS_H)
-#define AGRICOS_SENSORS_H
+#if !defined(__AGRICOS_SENSORS_H)
+#define __AGRICOS_SENSORS_H
 
+#include "board.h"
 #include "common.h"
 #include "sensors/include.h"
 
-#include "board.h"
+extern LinkedList<SensorInfo_t *> StationSensors;
 
 void AgricosSensors_Init();
+void AgricosSensors_Update();
 
-#endif  // AGRICOS_SENSORS_H
+#endif  // __AGRICOS_SENSORS_H

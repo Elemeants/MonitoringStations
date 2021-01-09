@@ -6,14 +6,14 @@
 
 bool MicroSD_Init(uint8_t cs_pin)
 {
-    logger << LOG_INFO << F("          └── Initializing MicroSD Card...") << EndLine;
+    logger << LOG_INFO << F("          └-- Initializing MicroSD Card...") << EndLine;
     if (SD.begin(cs_pin))
     {
-        logger << LOG_INFO << F("                  └── ") << LOGGER_TEXT_GREEN << F("OK") << EndLine;
+        logger << LOG_INFO << F("                  └-- ") << LOGGER_TEXT_GREEN << F("OK") << EndLine;
     }
     else
     {
-        logger << LOG_ERROR << F("                  └── ") << LOGGER_TEXT_RED << F("Not loaded") << EndLine;
+        logger << LOG_ERROR << F("                  └-- ") << LOGGER_TEXT_RED << F("Not loaded") << EndLine;
     }
 }
 

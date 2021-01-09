@@ -1,7 +1,0 @@
-#if !defined(RS485_CONFIG_H)
-#define RS485_CONFIG_H
-
-#define MONITORING_RS485_PORT Serial3
-#define MONITORING_RS485_BAUDRATE 9600
-
-#endif // RS485_CONFIG_H

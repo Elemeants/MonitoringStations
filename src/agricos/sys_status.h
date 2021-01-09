@@ -6,7 +6,7 @@
 typedef struct
 {
     Time_s sysTime;
-    eRtcMode_t sysRtcMode;
+    RTCMode_e sysRtcMode;
 
     uint32_t sysMilliseconds;
     uint32_t suceessMeasures;

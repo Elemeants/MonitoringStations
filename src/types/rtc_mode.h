@@ -6,6 +6,6 @@ typedef enum {
     RTC_15_MINUTES,
     RTC_2_MINUTES,
     RTC_OFF,
-} eRtcMode_t;
+} RTCMode_e;
 
 #endif // AGRICOS_KERNEL_TYPES_RTC_MODE_H

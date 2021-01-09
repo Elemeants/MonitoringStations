@@ -5,6 +5,7 @@
 #include "cli.h"
 #include "devices.h"
 #include "error_codes.h"
+#include "json_measures.h"
 #include "sensors.h"
 #include "style.h"
 
@@ -24,7 +25,12 @@ AgricosCore_Status_t AgricosSysStatus;
 
 static _JsonMeasureRegister JSONOutput;
 StaticJsonDocument<JSON_STATIC_RAM_SIZE> jsonFileRoot;
+char JSON_SERIALIZED_BUFFER[JSON_STATIC_RAM_SIZE];
+
 _MeasureRegister *MeasureRegister = &JSONOutput;
+
+_VariableRegister __variableRegister;
+_VariableRegister* VariableRegister = &__variableRegister;
 
 _ITaskRegister PostLoopTaskRegister;
 _ITaskRegister PreLoopTaskRegister;
@@ -39,14 +45,21 @@ void OS_init(void)
 void OS_reset(void)
 {
     wdt_enable(WDTO_1S);
-    logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F(" RESETING DEVICE... ") << EndLine;
+    logger << LOG_MASTER << LOGGER_TEXT_RED << F(" RESETING DEVICE... ") << EndLine;
     while (1)
         ;
 }
 
+static bool AgricosCore_BaseOutputTask()
+{
+    JSONOutput.serialize();
+    HTTP::post(Configuration::ServerUrl, (uint8_t *)JSON_SERIALIZED_BUFFER, JSON_STATIC_RAM_SIZE);
+    return true;
+}
+
 void (*AgricosCore_onFail)(void) __attribute__((weak)) = NULL;
 void (*AgricosCore_onSuccess)(void) __attribute__((weak)) = NULL;
-bool (*AgricosCore_OutputTask)(void) __attribute__((weak)) = NULL;
+bool (*AgricosCore_OutputTask)(void) __attribute__((weak)) = AgricosCore_BaseOutputTask;
 
 void throw_error(uint8_t errorCode)
 {
@@ -86,7 +99,7 @@ void AgricosCore_Init(void)
     logger << LOG_MASTER << LOGGER_TEXT_BOLD << F("------------------ Initializing Agricos ------------------") << EndLine;
     Configuration::init();
 
-    AgricosSysStatus.sysRtcMode = (eRtcMode_t)Configuration::readRTCMode();
+    AgricosSysStatus.sysRtcMode = (RTCMode_e)Configuration::readRTCMode();
 
     logger << LOG_MASTER << F("Initializing I2C Drivers") << EndLine;
     I2CBus.begin();
@@ -98,6 +111,8 @@ void AgricosCore_Init(void)
 
     logger << LOG_MASTER << F("Executing setup tasks") << EndLine;
     SetupTasksRegister.run();
+
+    AgricosSensors_Init();
 
     logger << LOG_MASTER << F("Configuring CLI Interface") << EndLine;
     AgricosCli_Setup();
@@ -112,7 +127,7 @@ void AgricosCore_Init(void)
         throw_error(AGRICOS_ERROR_OUT_FUNCTION_NOT_DEFINED);
     }
 
-    logger << LOG_MASTER << F("Executing loop...") << EndLine;
+    logger << LOG_MASTER << F("Executing main task loop...") << EndLine;
     while (1)
     {
         AgricosCore_Task();
@@ -146,6 +161,7 @@ void AgricosCore_Task(void)
 {
     static bool Agricos_isSended = false;
     AgricosSysStatus.sysMilliseconds = millis();
+
     doUntilTimeElapsed(__blink_led_handler, 250, {
         StatusLed::blink();
     });
@@ -153,7 +169,7 @@ void AgricosCore_Task(void)
         AgricosCore_UpdateDateTime();
     });
 
-    AgricosCli_CheckCommands();
+    AgricosCLI_CheckIfExistCommand();
 
     bool send = AgricosCore_SendDataTrigger();
 
@@ -166,6 +182,9 @@ void AgricosCore_Task(void)
 
         logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F("Executing MeasureRegister Init") << EndLine;
         MeasureRegister->init();
+
+        logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F("Executing Sensors update") << EndLine;
+        AgricosSensors_Update();
 
         if (AgricosCore_OutputTask())
         {

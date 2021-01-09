@@ -7,7 +7,7 @@
 #include "utils/datetime.h"
 
 // Local macro for prefix debug msg
-#define LOG_DEBUG_PREFIX_MSG "[\033[1m\033[35m DEBUG \033[0m]: "
+#define LOG_DEBUG_PREFIX_MSG "[\033[1m\033[35mDEBUG\033[0m]: "
 // Local macro for prefix info msg
 #define LOG_INFO_PREFIX_MSG "[\033[1m\033[32mINFO \033[0m]: "
 // Local macro for prefix warn msg

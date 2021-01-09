@@ -3,7 +3,7 @@
 
 #include "adc/setup.h"
 #include "gps/api.h"
-#include "sim800h/api.h"
+#include "gprs/api.h"
 #include "rtc/include.h"
 #include "status_led/driver.h"
 #include "microsd_card/api.h"

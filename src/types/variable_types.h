@@ -37,6 +37,7 @@ typedef enum
 
 typedef struct
 {
+    String id;
     VariableType_e type;
     float measure;
 } Variable_t;

@@ -7,7 +7,7 @@ extern IKernelLogger &logger;
 void _I2CBus::begin()
 {
     port.begin();
-    logger.log(F("     └── I2C bus begined"), LOG_INFO);
+    logger.log(F("     └-- I2C bus begined"), LOG_INFO);
     for (int i = 0; i < devices.size(); i++)
     {
         I2CDevice *device = devices[i];
@@ -35,7 +35,7 @@ void _I2CBus::scan()
     port.begin();
     I2CDevice test;
     test.setPort(this->port);
-    logger << LOG_INFO << F("     └── Scanning I2C Bus ") << EndLine;
+    logger << LOG_INFO << F("     └-- Scanning I2C Bus ") << EndLine;
     logger << LOG_INFO << F("    ");
 
     for (size_t i = 1; i < 127; i++)
