@@ -15,9 +15,22 @@ static void AgricosSensors_ModbusInit()
     LinkedList<ModbusSensor *> *list = ModbusController.dumpSensorList();
     for_in_range(auto, i, 0, list->size())
     {
-        SensorInfo_t *info = &list->get(i)->getInfo();
+        SensorInfo_t *info = list->get(i)->getInfo();
         StationSensors.add(info);
+
+        logger << LOG_INFO << F("        ├-- ID: ") << LOGGER_TEXT_YELLOW << info->id << LOGGER_TEXT_RESET << F(" Vars: ");
+        for_in_range(uint8_t, i, 0, info->variables.size())
+        {
+            logger << LOGGER_TEXT_YELLOW << VariableTypeToStr(info->variables.get(i).type) << LOGGER_TEXT_RESET;
+            if (i < info->variables.size() - 1)
+            {
+                logger << F(", ");
+            }
+        }
+        logger << LOGGER_TEXT_GREEN << F(" # OK") << EndLine;
     }
+
+    logger << LOG_MASTER << F("    ├-- Initializing Modbus") << EndLine;
     ModbusController.init();
 }
 

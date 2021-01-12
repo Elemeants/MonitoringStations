@@ -1,7 +1,7 @@
 #include "api.h"
 
-#include "modules/adafruit_fona/Adafruit_FONA.h"
 #include "common.h"
+#include "modules/adafruit_fona/Adafruit_FONA.h"
 
 #define GPRS_NS_HOST "internet.itelcel.com"
 #define GPRS_NS_USR "webgprs"
@@ -271,11 +271,17 @@ uint8_t HTTP::get(char *url, uint8_t *buffer, uint16_t lenght)
 
 void GSM_PrintStatus()
 {
-    logger << LOG_INFO << F("          └-- GSM STATUS ") << EndLine;
-    logger << LOG_INFO << F("                    GSM: ") << GPRSStatusToStr(GSM_Status.gsm.status) << EndLine;
-    logger << LOG_INFO << F("                   RSSI: ") << GSM_Status.gsm.rssi << F(" dB") << EndLine;
-    logger << LOG_INFO << F("                EN GPRS: ") << (GSM_Status.gprs.is_enabled ? F("Detached") : F("Attached")) << EndLine;
-    logger << LOG_INFO << F("                   GPRS: ") << GPRSNetworkStatusToStr(GSM_Status.gprs.status) << EndLine;
-    logger << LOG_INFO << F("                    NET: ") << GSM_Status.gprs.state << EndLine;
-    logger << LOG_INFO << F("                   CCID: ") << GSM_Status.sim.ccid << EndLine;
+    logger << LOG_INFO << F("          └-- GSM/GPRS STATUS ") << EndLine;
+    logger << LOG_INFO << F("                    GSM: ") 
+                                << LOGGER_TEXT_YELLOW << GPRSStatusToStr(GSM_Status.gsm.status) << EndLine;
+    logger << LOG_INFO << F("                   RSSI: ") 
+                                << LOGGER_TEXT_YELLOW << GSM_Status.gsm.rssi << F(" dB") << EndLine;
+    logger << LOG_INFO << F("                EN GPRS: ") 
+                                << LOGGER_TEXT_YELLOW << (GSM_Status.gprs.is_enabled ? F("Detached") : F("Attached")) << EndLine;
+    logger << LOG_INFO << F("                   GPRS: ") 
+                                << LOGGER_TEXT_YELLOW << GPRSNetworkStatusToStr(GSM_Status.gprs.status) << EndLine;
+    logger << LOG_INFO << F("                    NET: ") 
+                                << LOGGER_TEXT_YELLOW << GSM_Status.gprs.state << EndLine;
+    logger << LOG_INFO << F("                   CCID: ") 
+                                << LOGGER_TEXT_YELLOW << GSM_Status.sim.ccid << EndLine;
 }

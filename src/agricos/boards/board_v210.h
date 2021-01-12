@@ -43,8 +43,8 @@
 /**============================[ ADC Configuration ]============================*/
 
 #define ADC0_ENABLED 0
-#define ADC1_ENABLED 0
+#define ADC1_ENABLED 1
 #define ADC2_ENABLED 0
-#define ADC3_ENABLED 0
+#define ADC3_ENABLED 1
 
 #endif  // __AGRICOS_BOARDS_V210_H

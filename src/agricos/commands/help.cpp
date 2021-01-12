@@ -3,7 +3,7 @@
 
 static void AgricosCli_CMD_Help(cmd *_)
 {
-    logger.log(AgricosCli.toString(), LOG_MASTER);
+    logger << LOG_MASTER << EndLine << AgricosCli.toString();
 }
 
 void AgricosCli_Add_Help()

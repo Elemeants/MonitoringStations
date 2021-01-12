@@ -2,17 +2,24 @@
 
 uint16_t ModbusSensor::readRegister(uint16_t reg)
 {
+    logger << LOG_DEBUG << F("                  ├-- Creating command...");
     ModbusCmdBuilderOps_t cmd = ModbusCmdFactory::CreateReadCommand(deviceId, 1, reg);
 
     ModbusBuildCommand(cmd, tx_buffer, &tx_length, &rx_length);
+    logger << LOGGER_TEXT_GREEN << F(" # Ok") << EndLine;
 
+    logger << LOG_DEBUG << F("                  ├-- Sending...");
     bool success = layer.executeCommand(tx_buffer, tx_length, rx_buffer, rx_length);
     if (!success)
     {
+        logger << LOGGER_TEXT_RED << F(" # Error") << EndLine;
         return 0;
     }
+    logger << LOGGER_TEXT_GREEN << F(" # Ok") << EndLine;
 
+    logger << LOG_DEBUG << F("                  ├-- Parsing response...");
     uint16_t response = ParseSingleRegisterCommand(rx_buffer, rx_length);
+    logger << LOGGER_TEXT_GREEN << F(" # Ok") << EndLine;
     return response;
 }
 

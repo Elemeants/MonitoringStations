@@ -63,18 +63,20 @@ bool (*AgricosCore_OutputTask)(void) __attribute__((weak)) = AgricosCore_BaseOut
 
 void throw_error(uint8_t errorCode)
 {
+    logger << LOG_ERROR << LOGGER_TEXT_RED;
     switch (errorCode)
     {
     case AGRICOS_ERROR_TIME_PROVIDER_NOT_DEFINED:
-        logger << LOG_ERROR << F("TimeProvider is not defined") << EndLine;
+        logger << F("TimeProvider is not defined");
         break;
     case AGRICOS_ERROR_OUT_FUNCTION_NOT_DEFINED:
-        logger << LOG_ERROR << F("Output function is not defined") << EndLine;
+        logger << F("Output function is not defined");
         break;
     default:
-        logger << LOG_ERROR << F("Error ocurred... reseting device") << EndLine;
+        logger << F("Error ocurred... reseting device. Error code: 0x") << INT_HEX << errorCode << INT_DEC;
         break;
     }
+    logger << EndLine;
     OS_reset();
 }
 
@@ -101,13 +103,12 @@ void AgricosCore_Init(void)
 
     AgricosSysStatus.sysRtcMode = (RTCMode_e)Configuration::readRTCMode();
 
-    logger << LOG_MASTER << F("Initializing I2C Drivers") << EndLine;
+    logger << LOG_MASTER << F("Initializing I2C Bus") << EndLine;
+    I2CBus.scan();
     I2CBus.begin();
 
-    logger << LOG_MASTER << F("Initializing I2C Scan") << EndLine;
-    I2CBus.scan();
-
     AgricosDevices_Init();
+    AgricosSysStatus.initTime = TimeProvider->getTime();
 
     logger << LOG_MASTER << F("Executing setup tasks") << EndLine;
     SetupTasksRegister.run();

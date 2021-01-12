@@ -6,20 +6,22 @@ void RTC_Setup(IRTCI2c &rtc)
 {
     I2CBus.add(&rtc);
 
+    logger << LOG_MASTER << F("          └-- RTC Setup: ");
     if (rtc.isConnected())
     {
         if (!rtc.begin(rtc.address()))
         {
-            logger.log(F("          └-- Unable to begin to RTC"), LOG_ERROR);
+            logger << LOGGER_TEXT_RED << F("ERROR (Begin)");
         }
         else
         {
-            logger.log(F("          └-- RTC: OK"), LOG_MASTER);
+            logger << LOGGER_TEXT_GREEN << F("OK");
             rtc.update();
         }
     }
     else
     {
-        logger.log(F("          └-- Unable to connect to RTC"), LOG_ERROR);
+        logger << LOGGER_TEXT_RED << F("ERROR (Connection)");
     }
+    logger << EndLine;
 }

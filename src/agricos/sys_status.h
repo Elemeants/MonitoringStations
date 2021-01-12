@@ -5,6 +5,7 @@
 
 typedef struct
 {
+    Time_s initTime;
     Time_s sysTime;
     RTCMode_e sysRtcMode;
 

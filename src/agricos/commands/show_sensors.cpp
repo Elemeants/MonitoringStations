@@ -43,7 +43,9 @@ static void AgricosCli_CMD_ShowSensors(cmd *_)
                 c_s += 2;
             }
         }
+        logger << EndLine;
     }
+    logger << LOG_MASTER << F(" ---------------------------------------------------------------") << EndLine;
 }
 
 void AgricosCli_Add_ShowSensors()

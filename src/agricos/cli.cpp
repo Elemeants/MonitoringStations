@@ -20,4 +20,5 @@ void AgricosCli_Setup(void)
     AgricosCli_Add_SetDateTime();
 
     AgricosCli_Add_Test();
+    AgricosCli_Add_Reset();
 }

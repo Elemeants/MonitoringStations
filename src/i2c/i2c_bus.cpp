@@ -7,40 +7,54 @@ extern IKernelLogger &logger;
 void _I2CBus::begin()
 {
     port.begin();
-    logger.log(F("     └-- I2C bus begined"), LOG_INFO);
+    logger.log(F("     └-- Beginning I2C Bus"), LOG_INFO);
+    logger << INT_HEX;
+
     for (int i = 0; i < devices.size(); i++)
     {
         I2CDevice *device = devices[i];
+
+        logger << LOG_INFO << F("          └-- Device on 0x") << device->address() << F(" # ");
         if (device->isConnected())
         {
             if (!device->begin(device->address()))
             {
-                logger << LOG_ERROR << F("      ~ Can't begin addrs: 0x") << String(device->address(), HEX) << EndLine;
+                logger << LOGGER_TEXT_RED << F("ERROR (Begin)");
             }
             else
             {
-                logger << LOG_INFO << F("      + Device beginned on 0x") << String(device->address(), HEX) << EndLine;
+                logger << LOGGER_TEXT_GREEN << F("OK");
             }
         }
         else
         {
-            logger << LOG_ERROR << F("      ~ Device not connected addr: 0X") << String(device->address(), HEX) << EndLine;
+            logger << LOGGER_TEXT_RED << F("ERROR (Connection)");
         }
+        logger << EndLine;
     }
 }
 
 void _I2CBus::scan()
 {
+    uint8_t row = 0;
     char buffer[3];
     port.begin();
     I2CDevice test;
     test.setPort(this->port);
     logger << LOG_INFO << F("     └-- Scanning I2C Bus ") << EndLine;
-    logger << LOG_INFO << F("    ");
+    logger << LOG_INFO << F("         0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F") << EndLine;
+    logger << LOG_INFO << F("    00: -- ");
 
-    for (size_t i = 1; i < 127; i++)
+    for (size_t i = 1; i < 0x80; i++)
     {
         test.setAddress(i);
+    
+        if (i % 16 == 0)
+        {
+            row += 0x10;
+            sprintf(buffer, "%02X", row);
+            logger << EndLine << LOG_INFO << F("    ") << buffer << F(": ");
+        }
 
         if (test.isConnected())
         {
@@ -53,10 +67,6 @@ void _I2CBus::scan()
 
         logger << buffer << F(" ");
 
-        if (i % 16 == 0)
-        {
-            logger << EndLine << LOG_INFO << F("    ");
-        }
     }
     logger << EndLine;
 }

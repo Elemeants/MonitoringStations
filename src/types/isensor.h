@@ -41,13 +41,13 @@ protected:
     }
 
 public:
-    ISensor(const char* id, SensorProtocols_e protocol, const VariableType_e types[], uint8_t length)
+    ISensor(const char* id, SensorProtocols_e protocol, const VariableType_e vars[], uint8_t length)
     {
         info.id = id;
         info.protocol = protocol;
         for_in_range(uint8_t, i, 0, length)
         {
-            Variable_t var = VariableRegister->registerVariable(types[i]);
+            Variable_t var = VariableRegister->registerVariable(vars[i]);
             info.variables.add(var);
         }
     }
@@ -84,7 +84,7 @@ public:
     {
     }
 
-    SensorInfo_t getInfo() { return info; }
+    SensorInfo_t *getInfo() { return &info; }
 };
 
 #endif  // AGRICOS_SENSOR_ISENSOR_H

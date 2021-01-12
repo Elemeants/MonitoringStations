@@ -81,6 +81,8 @@ const __FlashStringHelper *VariableTypeToStr(VariableType_e type)
         return F("Water potential");
     case VARIABLE_TYPE_LEAF_HUMIDITY:
         return F("Leaf humidity");
+    case VARIABLE_TYPE_SOIL_SALINITY:
+        return F("Salinity");
     default:
         return F("Not assigned");
     }

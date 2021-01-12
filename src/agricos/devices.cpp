@@ -46,7 +46,8 @@ IAdcI2CDevice *ADC_Devices[] = {
 
 void AgricosDevices_Init(void)
 {
-    logger << LOG_MASTER << LOGGER_TEXT_GREEN << F("Initializing Devices") << EndLine;
+    logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F("Initializing Devices [")
+           << LOGGER_TEXT_GREEN << F("Board ") <<  BOARD_VERSION << LOGGER_TEXT_YELLOW << F("]") << EndLine;
 
     logger << LOG_MASTER << F("    ├-- Initializing Drivers - RTC") << EndLine;
     RTC_Setup(_rtc);

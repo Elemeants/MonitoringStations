@@ -7,7 +7,7 @@
 #define PROGRAMMER_NAME "Daniel Polanco"
 
 // Firmware AgricOS
-#define FIRMWARE_VERSION "v3.0"
+#define FIRMWARE_VERSION "v3.0.1"
 
 // Compilation firmware status
 #define COMPILATION_VERSION FIRMWARE_VERSION "." __TIME__ "." __DATE__

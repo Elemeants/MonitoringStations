@@ -2,11 +2,16 @@
 
 void ModbusSensorBus::init()
 {
+    logger << LOG_MASTER << F("        ├-- Initializing transport layer...");
     layer.init();
+    logger << LOGGER_TEXT_GREEN << F(" # OK") << EndLine;
+
+    logger << LOG_MASTER << F("        ├-- Setup registrated sensors...");
     for_in_range(auto, i, 0, sensors.size())
     {
         sensors.get(i)->setup();
     }
+    logger << LOGGER_TEXT_GREEN << F(" # OK") << EndLine;
 }
 
 void ModbusSensorBus::updateAll()

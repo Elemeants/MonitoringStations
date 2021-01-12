@@ -16,5 +16,6 @@ extern void AgricosCli_Add_SetRtcMode();
 extern void AgricosCli_Add_SetDateTime();
 
 extern void AgricosCli_Add_Test();
+extern void AgricosCli_Add_Reset();
 
 #endif  // __AGRICOS_CLI_COMMANDS_H
