@@ -6,6 +6,10 @@ uint16_t ModbusSensor::readRegister(uint16_t reg)
     ModbusCmdBuilderOps_t cmd = ModbusCmdFactory::CreateReadCommand(deviceId, 1, reg);
 
     ModbusBuildCommand(cmd, tx_buffer, &tx_length, &rx_length);
+    logger << INT_HEX;
+    for_in_range(uint8_t, i, 0, tx_length) { logger << F("0x") << tx_buffer[i] << F(" "); }
+    logger << INT_DEC;
+
     logger << LOGGER_TEXT_GREEN << F(" # Ok") << EndLine;
 
     logger << LOG_DEBUG << F("                  ├-- Sending...");
@@ -17,9 +21,9 @@ uint16_t ModbusSensor::readRegister(uint16_t reg)
     }
     logger << LOGGER_TEXT_GREEN << F(" # Ok") << EndLine;
 
-    logger << LOG_DEBUG << F("                  ├-- Parsing response...");
+    logger << LOG_DEBUG << F("                  ├-- Parsing response... ");
     uint16_t response = ParseSingleRegisterCommand(rx_buffer, rx_length);
-    logger << LOGGER_TEXT_GREEN << F(" # Ok") << EndLine;
+    logger << LOGGER_TEXT_YELLOW << response << LOGGER_TEXT_GREEN << F(" # Ok") << EndLine;
     return response;
 }
 
@@ -39,6 +43,10 @@ LinkedList<uint16_t> ModbusSensor::readMultiRegister(uint16_t reg, uint16_t no_r
     ModbusCmdBuilderOps_t cmd = ModbusCmdFactory::CreateReadCommand(deviceId, no_regs, reg);
 
     ModbusBuildCommand(cmd, tx_buffer, &tx_length, &rx_length);
+    logger << INT_HEX;
+    for_in_range(uint8_t, i, 0, tx_length) { logger << F("0x") << tx_buffer[i] << F(" "); }
+    logger << INT_DEC;
+
     logger << LOGGER_TEXT_GREEN << F(" # Ok") << EndLine;
 
     logger << LOG_DEBUG << F("                  ├-- Sending...");
@@ -50,8 +58,12 @@ LinkedList<uint16_t> ModbusSensor::readMultiRegister(uint16_t reg, uint16_t no_r
     }
     logger << LOGGER_TEXT_GREEN << F(" # Ok") << EndLine;
 
-    logger << LOG_DEBUG << F("                  ├-- Parsing response...");
+    logger << LOG_DEBUG << F("                  ├-- Parsing response... ");
     LinkedList<uint16_t> response = ParseMultiRegisterCommand(rx_buffer, rx_length);
+
+    logger << LOGGER_TEXT_YELLOW;
+    for_in_range(uint8_t, i, 0, response.size()) { logger << response[i] << F(" "); }
+
     logger << LOGGER_TEXT_GREEN << F(" # Ok") << EndLine;
     return response;
 }
