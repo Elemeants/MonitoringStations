@@ -71,8 +71,8 @@ const __FlashStringHelper *GPRSNetworkStatusToStr(GPRSNetworkStatus_e st);
 const __FlashStringHelper *GPRSStatusToStr(GPRSStatus_e st);
 const __FlashStringHelper *http_method_to_str(HTTP_METHOD_e method);
 
-void GSM_Init();
-void GSM_GPRSInit();
+bool GSM_Init();
+bool GSM_GPRSInit();
 void GSM_PrintStatus();
 
 namespace HTTP

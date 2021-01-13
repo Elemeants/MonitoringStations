@@ -47,19 +47,20 @@ IAdcI2CDevice *ADC_Devices[] = {
 void AgricosDevices_Init(void)
 {
     logger << LOG_MASTER << LOGGER_TEXT_YELLOW << F("Initializing Devices [")
-           << LOGGER_TEXT_GREEN << F("Board ") <<  BOARD_VERSION << LOGGER_TEXT_YELLOW << F("]") << EndLine;
+           << LOGGER_TEXT_GREEN << F("Board ") << BOARD_VERSION << LOGGER_TEXT_YELLOW << F("]") << EndLine;
 
     logger << LOG_MASTER << F("    ├-- Initializing Drivers - RTC") << EndLine;
     RTC_Setup(_rtc);
 
-    // logger << LOG_INFO << F("    ├-- Initializing GSM device") << EndLine;
-    // GSM_Init();
+    logger << LOG_INFO << F("    ├-- Initializing GSM device") << EndLine;
+    if (GSM_Init())
+    {
+        logger << LOG_INFO << F("    ├-- Initializing GPRS") << EndLine;
+        GSM_GPRSInit();
 
-    // logger << LOG_INFO << F("    ├-- Initializing GPRS") << EndLine;
-    // GSM_GPRSInit();
-
-    // logger << LOG_INFO << F("    ├-- GSM/GPRS Status") << EndLine;
-    // GSM_PrintStatus();
+        logger << LOG_INFO << F("    ├-- GSM/GPRS Status") << EndLine;
+        GSM_PrintStatus();
+    }
 
     logger << LOG_MASTER << F("    ├-- Initializing Drivers - ACD") << EndLine;
     ADC_Init(ADC_Devices, array_size(ADC_Devices));

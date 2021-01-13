@@ -56,7 +56,7 @@ static void GSM_CheckStatus()
     }
 }
 
-void GSM_Init()
+bool GSM_Init()
 {
     gsm_device.setGPRSNetworkSettings(F(GPRS_NS_HOST), F(GPRS_NS_USR), F(GPRS_NS_PSS));
     GSM_SerialPort.begin(GSM_SERIAL_BAUDRATE);
@@ -80,9 +80,11 @@ void GSM_Init()
         }
         attempts++;
     }
+
+    return isBegined;
 }
 
-void GSM_GPRSInit()
+bool GSM_GPRSInit()
 {
     if (gprs_status == GPRS_NOT_CONNECTED)
     {
@@ -106,6 +108,7 @@ void GSM_GPRSInit()
         }
         attempts++;
     }
+    return isEnabledGPRS;
 }
 
 const __FlashStringHelper *GPRSNetworkStatusToStr(GPRSNetworkStatus_e st)
@@ -272,16 +275,16 @@ uint8_t HTTP::get(char *url, uint8_t *buffer, uint16_t lenght)
 void GSM_PrintStatus()
 {
     logger << LOG_INFO << F("          └-- GSM/GPRS STATUS ") << EndLine;
-    logger << LOG_INFO << F("                    GSM: ") 
-                                << LOGGER_TEXT_YELLOW << GPRSStatusToStr(GSM_Status.gsm.status) << EndLine;
-    logger << LOG_INFO << F("                   RSSI: ") 
-                                << LOGGER_TEXT_YELLOW << GSM_Status.gsm.rssi << F(" dB") << EndLine;
-    logger << LOG_INFO << F("                EN GPRS: ") 
-                                << LOGGER_TEXT_YELLOW << (GSM_Status.gprs.is_enabled ? F("Detached") : F("Attached")) << EndLine;
-    logger << LOG_INFO << F("                   GPRS: ") 
-                                << LOGGER_TEXT_YELLOW << GPRSNetworkStatusToStr(GSM_Status.gprs.status) << EndLine;
-    logger << LOG_INFO << F("                    NET: ") 
-                                << LOGGER_TEXT_YELLOW << GSM_Status.gprs.state << EndLine;
-    logger << LOG_INFO << F("                   CCID: ") 
-                                << LOGGER_TEXT_YELLOW << GSM_Status.sim.ccid << EndLine;
+    logger << LOG_INFO << F("                    GSM: ")
+           << LOGGER_TEXT_YELLOW << GPRSStatusToStr(GSM_Status.gsm.status) << EndLine;
+    logger << LOG_INFO << F("                   RSSI: ")
+           << LOGGER_TEXT_YELLOW << GSM_Status.gsm.rssi << F(" dB") << EndLine;
+    logger << LOG_INFO << F("                EN GPRS: ")
+           << LOGGER_TEXT_YELLOW << (GSM_Status.gprs.is_enabled ? F("Detached") : F("Attached")) << EndLine;
+    logger << LOG_INFO << F("                   GPRS: ")
+           << LOGGER_TEXT_YELLOW << GPRSNetworkStatusToStr(GSM_Status.gprs.status) << EndLine;
+    logger << LOG_INFO << F("                    NET: ")
+           << LOGGER_TEXT_YELLOW << GSM_Status.gprs.state << EndLine;
+    logger << LOG_INFO << F("                   CCID: ")
+           << LOGGER_TEXT_YELLOW << GSM_Status.sim.ccid << EndLine;
 }
